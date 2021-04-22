@@ -17,7 +17,7 @@ lint:
 	poetry run flake8 page_loader
 
 test:
-	poetry run pytest -vv
+	poetry run coverage run -m pytest -v
 
 coverage:
 	poetry run coverage xml
