@@ -25,6 +25,9 @@ def main():
     except FileExistsError:
         exit_code = 1
         logger.error('You have already downloaded this page')
+    except requests.exceptions.HTTPError:
+        exit_code = 1
+        logger.error('Page not found')
     except PermissionError:
         exit_code = 1
         logger.error(

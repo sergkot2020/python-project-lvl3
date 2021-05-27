@@ -111,5 +111,11 @@ def test_network_error():
         with pytest.raises(requests.exceptions.ConnectionError):
             with tempfile.TemporaryDirectory() as tmp_dir:
                 download(NOT_EXIST_URL, path=tmp_dir)
-                assert True
+
+        code_errors = [404, 500]
+        for code in code_errors:
+            req_mocker.get(NOT_EXIST_URL, status_code=code)
+            with pytest.raises(requests.exceptions.HTTPError):
+                with tempfile.TemporaryDirectory() as tmp_dir:
+                    download(NOT_EXIST_URL, path=tmp_dir)
 

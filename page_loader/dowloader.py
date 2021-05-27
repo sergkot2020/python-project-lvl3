@@ -57,7 +57,7 @@ def save_content(request, file_name, path):
 
 def download(url, path=os.getcwd()):
     req = requests.get(url)
-
+    req.raise_for_status()
     logger.info(f'Get page from {url}')
 
     soup = BeautifulSoup(req.text, 'html.parser')
