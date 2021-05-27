@@ -90,3 +90,5 @@ def download(url, path=os.getcwd()):
         file.write(str(soup.prettify(formatter='html5')))
 
     logger.info(f'Page {page_name} was saved to {full_path}')
+
+    return full_path
