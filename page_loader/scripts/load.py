@@ -25,6 +25,11 @@ def main():
     except FileExistsError:
         exit_code = 1
         logger.error('You have already downloaded this page')
+    except PermissionError:
+        exit_code = 1
+        logger.error(
+            'No permission to write the file to the directory'
+        )
     except Exception as e:
         exit_code = 1
         logger.exception(e)
