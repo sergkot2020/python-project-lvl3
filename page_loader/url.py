@@ -28,4 +28,6 @@ def gen_file_name(url):
     parsed_url = urlparse(url)
     path = parsed_url.netloc + parsed_url.path
     name, tail = os.path.splitext(path)
+    if not tail:
+        tail = '.html'
     return f'{_replace_character(name)}{tail}'
