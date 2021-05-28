@@ -13,7 +13,7 @@ TEST_DIR = 'tests'
 STATIC_DIR = 'static'
 FIXTURE_DIR = 'fixtures'
 
-BASE_PATH = os.path.join(os.getcwd(), TEST_DIR,  FIXTURE_DIR)
+BASE_PATH = os.path.join(os.getcwd(), TEST_DIR, FIXTURE_DIR)
 
 NOT_EXIST_PATH = '/some/not_exist/path'
 NOT_EXIST_URL = 'https://not_exist_url.with_not_exist_domen'
@@ -118,4 +118,3 @@ def test_network_error():
             with pytest.raises(requests.exceptions.HTTPError):
                 with tempfile.TemporaryDirectory() as tmp_dir:
                     download(NOT_EXIST_URL, path=tmp_dir)
-
