@@ -89,6 +89,6 @@ def download(url, path=os.getcwd()):
     with open(full_path, "w") as file:
         file.write(str(soup.prettify(formatter='html5')))
 
-    logger.info(full_path)
+    print(full_path)
 
     return full_path
