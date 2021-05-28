@@ -2,20 +2,42 @@
 
 """Run script module."""
 
-import os
+import sys
 
-import argparse
+import page_loader
+import requests
+from page_loader.logger import get_logger
 
-from page_loader.dowloader import download
+logger = get_logger(__name__)
 
 
 def main():
-    """Run script."""
-    parser = argparse.ArgumentParser(description='page-loader')
-    parser.add_argument('--output', type=str, default=os.getcwd())
-    parser.add_argument('url', type=str)
-    args = parser.parse_args()
-    download(args.output, args.url)
+    url, path = page_loader.parse()
+    exit_code = 0
+    try:
+        page_loader.download(url, path=path)
+    except FileNotFoundError:
+        exit_code = 1
+        logger.error(f'Directory {path} doesn`t exist')
+    except requests.exceptions.ConnectionError:
+        exit_code = 1
+        logger.error('Network problems')
+    except FileExistsError:
+        exit_code = 1
+        logger.error('You have already downloaded this page')
+    except requests.exceptions.HTTPError:
+        exit_code = 1
+        logger.error('Page not found')
+    except PermissionError:
+        exit_code = 1
+        logger.error(
+            'No permission to write the file to the directory'
+        )
+    except Exception as e:
+        exit_code = 1
+        logger.exception(e)
+    finally:
+        sys.exit(exit_code)
 
 
 if __name__ == '__main__':
