@@ -4,9 +4,9 @@ from urllib.parse import urlparse
 CHAR = '-'
 
 
-def _replace_character(string):
+def _replace_character(string: str):
     skip_symbols = ''.join(
-        filter(lambda s: not (s.isalpha() or s.isnumeric()), string)
+        filter(lambda s: not (s.isalpha() or s.isnumeric()), string.strip('/'))
     )
     replace_rule = str.maketrans(skip_symbols, CHAR * len(skip_symbols))
     return string.translate(replace_rule)
