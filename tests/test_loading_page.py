@@ -4,8 +4,8 @@ import tempfile
 import pytest
 import requests
 import requests_mock
+
 from page_loader import download
-from page_loader.dowloader import gen_dir_name, gen_file_name, gen_page_name
 
 URL = 'http://test_url.ru'
 
