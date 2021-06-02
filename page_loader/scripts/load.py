@@ -15,16 +15,14 @@ def main():
     url, path = page_loader.parse()
     exit_code = 0
     try:
-        page_loader.download(url, path=path)
+        page_path = page_loader.download(url, path=path)
+        print(page_path)
     except FileNotFoundError:
         exit_code = 1
         logger.error(f'Directory {path} doesn`t exist')
     except requests.exceptions.ConnectionError:
         exit_code = 1
         logger.error('Network problems')
-    except FileExistsError:
-        exit_code = 1
-        logger.error('You have already downloaded this page')
     except requests.exceptions.HTTPError:
         exit_code = 1
         logger.error('Page not found')

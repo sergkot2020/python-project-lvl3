@@ -21,7 +21,7 @@ def download_assets(url, tags: list) -> List[tuple]:
 
     assets = []
     bar = Bar(
-        f'{"Downloading static files": <30}',
+        f'{"Downloading static files": <120}',
         fill='#',
         max=len(tags),
         check_tty=False
@@ -33,7 +33,7 @@ def download_assets(url, tags: list) -> List[tuple]:
         link_netloc = urlparse(link).netloc
         if link_netloc and link_netloc != page_netloc:
             continue
-        file_url = urljoin(url, link)
+        file_url = urljoin(url + '/', link)
         file_name = gen_file_name(file_url)
         request = requests.get(file_url)
         assets.append((tag, source, file_name, request))
@@ -43,8 +43,8 @@ def download_assets(url, tags: list) -> List[tuple]:
 
 def save_content(request, file_name, path):
     bar = Bar(
-        f'{file_name: <30}',
-        fill='=',
+        f'{file_name: <120}',
+        fill='-',
         max=len(request.content) / 128,
         check_tty=False
     )
@@ -72,8 +72,9 @@ def download(url, path=os.getcwd()):
         dir_name = gen_dir_name(url)
         dir_path = os.path.join(path, dir_name)
 
-        logger.info(f'Create directory {dir_path}')
-        os.mkdir(dir_path)
+        if not os.path.exists(dir_path):
+            logger.info(f'Create directory {dir_path}')
+            os.mkdir(dir_path)
 
         for tag, source, file_name, request in assets:
             tag[source] = os.path.join(dir_name, file_name)
@@ -86,9 +87,7 @@ def download(url, path=os.getcwd()):
     page_name = gen_page_name(url)
     full_path = os.path.join(path, page_name)
 
-    with open(full_path, "w") as file:
+    with open(full_path, "w+") as file:
         file.write(str(soup.prettify(formatter='html5')))
-
-    print(full_path)
 
     return full_path

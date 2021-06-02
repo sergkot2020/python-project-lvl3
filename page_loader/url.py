@@ -5,11 +5,12 @@ CHAR = '-'
 
 
 def _replace_character(string: str):
+    clear_string = string.strip('/')
     skip_symbols = ''.join(
-        filter(lambda s: not (s.isalpha() or s.isnumeric()), string.strip('/'))
+        filter(lambda s: not (s.isalpha() or s.isnumeric()), clear_string)
     )
     replace_rule = str.maketrans(skip_symbols, CHAR * len(skip_symbols))
-    return string.translate(replace_rule)
+    return clear_string.translate(replace_rule)
 
 
 def gen_page_name(url):

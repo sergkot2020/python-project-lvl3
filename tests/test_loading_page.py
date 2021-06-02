@@ -14,32 +14,30 @@ STATIC_DIR = 'static'
 FIXTURE_DIR = 'fixtures'
 
 BASE_PATH = os.path.join(os.getcwd(), TEST_DIR, FIXTURE_DIR)
-
-NOT_EXIST_PATH = '/some/not_exist/path'
+NOT_EXIST_PATH = os.path.join('some', 'doesn`t exist', 'path')
 NOT_EXIST_URL = 'https://not_exist_url.with_not_exist_domen'
 
 CHECKING_HTML = 'processed.html'
-
 ORIGIN_HTML = (
     'http://test_url.ru',
-    gen_page_name('http://test_url.ru'),
+    'test-url-ru.html',
     os.path.join(BASE_PATH, 'index.html')
 )
-
-FILES = [
+DIR_NAME = 'test-url-ru_files'
+ASSETS = [
     (
         'http://test_url.ru/images/test.jpg',
-        gen_file_name('http://test_url.ru/images/test.jpg'),
+        'test-url-ru-images-test.jpg',
         os.path.join(BASE_PATH, STATIC_DIR, '187.jpg')
     ),
     (
         'http://test_url.ru/static/css.css',
-        gen_file_name('http://test_url.ru/static/css.css'),
+        'test-url-ru-static-css.css',
         os.path.join(BASE_PATH, STATIC_DIR, 'style.css')
     ),
     (
         'http://test_url.ru/js/test.js',
-        gen_file_name('http://test_url.ru/js/test.js'),
+        'test-url-ru-js-test.js',
         os.path.join(BASE_PATH, STATIC_DIR, 'test.js')
     )
 ]
@@ -50,15 +48,14 @@ def read_file(path, mode='rb'):
         return file.read()
 
 
-def mock_files(mocker):
-    files = []
-    for file_data in FILES:
-        url, file_name, path = file_data
+def mock_assets(mocker):
+    assets = []
+    for url, file_name, path in ASSETS:
         file = read_file(path)
-        files.append((file_name, file))
+        assets.append((file_name, file))
         mocker.get(url, content=file)
 
-    return files
+    return assets
 
 
 def test_load_page():
@@ -67,19 +64,18 @@ def test_load_page():
         origin_html = read_file(path, mode='r')
         mocker.get(main_url, text=origin_html)
 
-        files = mock_files(mocker)
+        assets = mock_assets(mocker)
 
         checking_html = read_file(os.path.join(BASE_PATH, CHECKING_HTML), mode='r')
         with tempfile.TemporaryDirectory() as tmp_dir:
             download(main_url, path=tmp_dir)
 
-            file_dir = gen_dir_name(URL)
-            assert os.path.exists(os.path.join(tmp_dir, file_dir))
+            assert os.path.exists(os.path.join(tmp_dir, DIR_NAME))
 
-            for file_name, file in files:
-                file_path = os.path.join(tmp_dir, file_dir, file_name)
+            for file_name, asset in assets:
+                file_path = os.path.join(tmp_dir, DIR_NAME, file_name)
                 assert os.path.exists(file_path)
-                assert read_file(file_path) == file
+                assert read_file(file_path) == asset
 
             path = os.path.join(tmp_dir, page_name)
             processed_html = read_file(path, mode='r')
@@ -92,17 +88,10 @@ def test_os_error():
         origin_html = read_file(path, mode='r')
         mocker.get(main_url, text=origin_html)
 
-        mock_files(mocker)
+        mock_assets(mocker)
 
         with pytest.raises(FileNotFoundError):
-            download(main_url, path=NOT_EXIST_PATH)
-            assert True
-
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            download(main_url, path=tmp_dir)
-            with pytest.raises(FileExistsError):
-                download(main_url, path=tmp_dir)
-                assert True
+            assert download(main_url, path=NOT_EXIST_PATH)
 
 
 def test_network_error():
@@ -115,6 +104,6 @@ def test_network_error():
         code_errors = [404, 500]
         for code in code_errors:
             req_mocker.get(NOT_EXIST_URL, status_code=code)
-            with pytest.raises(requests.exceptions.HTTPError):
-                with tempfile.TemporaryDirectory() as tmp_dir:
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                with pytest.raises(requests.exceptions.HTTPError):
                     download(NOT_EXIST_URL, path=tmp_dir)
